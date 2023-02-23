@@ -27,4 +27,4 @@ export const httpServer = createServer((req, res) => {
   res.end()
 })
 
-httpServer.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
+httpServer.listen(PORT, () => console.log(`Server listening on port ${PORT}, with cors url: ${CORS_URL}`))
