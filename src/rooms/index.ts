@@ -1,12 +1,11 @@
 import CustomSet from "../classes/customObjects/CustomSet";
 import Room from "../classes/Room";
+import User from "../classes/User";
 
 class RoomsSet extends CustomSet {
-  changeRoomName (roomId: number, newName: string) {
+  sendMessageToRoom (roomId: number, user: User, message: string) {
     const room: Room = this.find((room: Room) => room.id === roomId)
-    this.delete(room)
-    room.name = newName
-    this.add(room)
+    room.sendMessage(user, message)
   }
 }
 

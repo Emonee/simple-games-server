@@ -6,6 +6,6 @@ export default class CustomSet extends Set {
       result = room
       break
     }
-    return result
+    return result || undefined
   }
 }

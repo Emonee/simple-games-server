@@ -30,7 +30,7 @@ export default class Room {
   removeUser (user: User) {
     return this.participants.delete(user)
   }
-  sendMessage (user: User, value: string) {
-    this.chat.push({ createdAt: new Date(), user, value })
+  sendMessage (user: User, message: string) {
+    this.chat.push({ createdAt: new Date(), user, message })
   }
 }
