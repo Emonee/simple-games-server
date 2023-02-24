@@ -9,17 +9,17 @@ const io = new Server(httpServer, {
   }
 })
 
-io.of(/^\/rooms\/\d/).on('connection', (socket) => {
-  console.log('client connected')
+const roomNamespace = io.of(/^\/rooms\/\d/)
 
+roomNamespace.on('connection', function (socket) {
   const roomId = socket.nsp.name.slice(7)
   socket.join(roomId)
   socket.emit('getRoom', getRoomById(+roomId))
 
   socket.on('changeRoomName', (newRoomName: string) => {
     rooms.changeRoomName(+roomId, newRoomName)
-    socket.to(roomId).emit('getRoom', getRoomById(+roomId))
-})
+    roomNamespace.to(roomId).emit('getRoom', getRoomById(+roomId))
+  })
 })
 
 function getRoomById(roomId: number) {
