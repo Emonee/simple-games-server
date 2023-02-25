@@ -24,16 +24,20 @@ roomNamespace.on('connection', function (socket) {
   socket.once('joinGameRoom', (userNickName) => {
     user = new User(userNickName)
     room.addUser(user)
-    
+    if (room.participants.size === 1) room.ownerUser = user
+    socket.emit('getChat', room.chat)
+    socket.emit('getGeneralRoomData', { name: room.name, ownerUser: room.ownerUser })
+    roomNamespace.to(roomId).emit('getParticipants', [...room.participants])
   })
   socket.on('sendMessage', (message: string) => {
-    rooms.sendMessageToRoom(+roomId, user, message)
-    roomNamespace.to(roomId).emit('getRoom', room)
+    room.sendMessage(user, message)
+    roomNamespace.to(roomId).emit('getChat', room.chat)
   })
 
   socket.on('disconnect', () => {
     room.removeUser(user)
-    if (room.participants.size < 1) rooms.delete(room)
+    if (room.participants.size < 1) return rooms.delete(room)
+    roomNamespace.to(roomId).emit('getParticipants', [...room.participants])
   })
 })
 

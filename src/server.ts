@@ -15,9 +15,8 @@ export const httpServer = createServer((req, res) => {
     let body: { roomName: string, userNickName: string }
     req.on('data', (chunk) => body = JSON.parse(chunk.toString()))
     req.on('end', () => {
-      const { roomName, userNickName } = body
-      const user = new User(userNickName)
-      const newRoom = new Room(roomName, user, new Game())
+      const { roomName } = body
+      const newRoom = new Room(roomName, new Game())
       rooms.add(newRoom)
       res.end(newRoom.id.toString())
     })

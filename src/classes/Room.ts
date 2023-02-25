@@ -1,5 +1,5 @@
-import { Message } from "../types"
 import Game from "./games/Game"
+import Message from "./Message"
 import User from "./User"
 
 
@@ -8,19 +8,18 @@ export default class Room {
   readonly createdAt: Date
   name: string
   readonly game: Game
-  readonly ownerUser: User
+  ownerUser?: User
   participants: Set<User>
   chat: Array<Message>
 
   static id = 0
   
-  constructor (name: string, ownerUser: User, game: Game) {
+  constructor (name: string, game: Game) {
     this.id = ++Room.id
     this.createdAt = new Date()
     this.name = name
     this.game = game
-    this.ownerUser = ownerUser
-    this.participants = new Set([ownerUser])
+    this.participants = new Set()
     this.chat = []
   }
 
@@ -31,6 +30,7 @@ export default class Room {
     return this.participants.delete(user)
   }
   sendMessage (user: User, message: string) {
-    this.chat.push({ createdAt: new Date(), user, message })
+    const newMessage = new Message(user, message)
+    this.chat.push(newMessage)
   }
 }
