@@ -1,21 +1,18 @@
-import Game from "./games/Game"
-import RPS from "./games/specificGames/RPS/RPS"
 import Message from "./Message"
 import User from "./User"
-
 
 export default class Room {
   readonly id: number
   readonly createdAt: Date
   name: string
-  game: RPS
+  game: any
   ownerUser?: User
   participants: Set<User>
   chat: Array<Message>
 
   static id = 0
   
-  constructor (name: string, game: RPS) {
+  constructor (name: string, game: any) {
     this.id = ++Room.id
     this.createdAt = new Date()
     this.name = name
