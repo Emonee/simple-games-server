@@ -1,6 +1,5 @@
 import User from "../../../User";
-import Game from "../../Game";
-import Result from "./Result";
+import RPSResult from "./RPSResult";
 
 export enum Plays {
   None,
@@ -9,31 +8,41 @@ export enum Plays {
   Sissors
 }
 
-enum GameState {
-  WaintingPlays,
-  ShowingResults
-}
-
-export default class RPS extends Game {
+export default class RPS {
+  readonly id: number
   readonly name: string
+  players: Array<User>
   firstPlayerPlay: Plays
   secondPlayerPlay: Plays
   firstPlayerVictories: number
   secondPlayerVictories: number
-  state: GameState
-  results: Array<Result>
+  results: Array<RPSResult>
+
+  static id = 0
 
   constructor () {
-    super()
+    this.id = ++RPS.id
     this.name = 'RPS'
+    this.players = []
     this.firstPlayerPlay = Plays.None
     this.secondPlayerPlay = Plays.None
     this.firstPlayerVictories = 0
     this.secondPlayerVictories = 0
-    this.state = GameState.WaintingPlays
     this.results = []
   }
 
+  joinGame(player: User) {
+    const playersIsFull = this.players.length > 2
+    const playerAlreadyInGame = this.players.includes(player)
+    if (playersIsFull || playerAlreadyInGame) return
+    this.players.push(player)
+  }
+  leaveGame (player: User) {
+    if (!this.players.includes(player)) return
+    const playersSet = new Set(this.players)
+    playersSet.delete(player)
+    this.players = [...playersSet]
+  }
   setMove (move: Plays, user: User) {
     const playerIndex = this.players.indexOf(user)
     if (playerIndex < 0 || playerIndex > 1) return
@@ -48,15 +57,15 @@ export default class RPS extends Game {
     this.secondPlayerVictories = 0
   }
   firstPlayerWin () {
-    this.results.push(new Result(false, this.players[0]))
+    this.results.push(new RPSResult(false, this.players[0]))
     this.firstPlayerVictories++
   }
   secondPlayerWin () {
-    this.results.push(new Result(false, this.players[1]))
+    this.results.push(new RPSResult(false, this.players[1]))
     this.secondPlayerVictories++
   }
   isTie () {
-    this.results.push(new Result(true))
+    this.results.push(new RPSResult(true))
     this.firstPlayerPlay = Plays.None
     this.secondPlayerPlay = Plays.None
   }
