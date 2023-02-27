@@ -11,17 +11,24 @@ export const httpServer = createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.end()
   if (req.url === '/rooms/new' && req.method === 'POST') {
-    let body: { roomName: string, userNickName: string }
+    let body: { roomName: string, userNickName: string, roomsGame: string }
     req.on('data', (chunk) => body = JSON.parse(chunk.toString()))
     req.on('end', () => {
-      const { roomName } = body
-      const newRoom = new Room(roomName, new RPS())
+      const { roomName, roomsGame } = body
+      const game: any = 
+        roomsGame === 'RPS' ? new RPS() :
+        undefined
+      if (!game) {
+        res.writeHead(404, 'game not found')
+        return res.end()
+      }
+      const newRoom = new Room(roomName, game)
       rooms.add(newRoom)
       res.end(newRoom.id.toString())
     })
     return
   }
-  res.writeHead(404)
+  res.writeHead(404, 'resource not found')
   res.end()
 })
 
