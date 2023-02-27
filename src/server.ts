@@ -1,7 +1,6 @@
 import { createServer } from 'http'
-import Game from './classes/games/Game'
+import RPS from './classes/games/specificGames/RPS/RPS'
 import Room from './classes/Room'
-import User from './classes/User'
 import { rooms } from './rooms'
 
 const PORT = process.env.PORT || 8080
@@ -16,7 +15,7 @@ export const httpServer = createServer((req, res) => {
     req.on('data', (chunk) => body = JSON.parse(chunk.toString()))
     req.on('end', () => {
       const { roomName } = body
-      const newRoom = new Room(roomName, new Game())
+      const newRoom = new Room(roomName, new RPS())
       rooms.add(newRoom)
       res.end(newRoom.id.toString())
     })
