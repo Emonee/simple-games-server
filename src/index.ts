@@ -56,7 +56,7 @@ roomNamespace.on('connection', function (socket) {
 
   socket.on('disconnect', () => {
     room.removeUser(user)
-    // if (room.participants.size < 1) return rooms.delete(room)
+    if (room.participants.size < 1) return rooms.delete(room)
     roomNamespace.to(roomId).emit('getGame', room.game)
     roomNamespace.to(roomId).emit('getParticipants', [...room.participants])
   })
