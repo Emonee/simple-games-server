@@ -11,7 +11,8 @@ export enum Plays {
 export default class RPS {
   readonly id: number
   readonly name: string
-  players: Array<User>
+  firstPlayerSeat?: User
+  secondPlayerSeat?: User
   firstPlayerPlay: Plays
   secondPlayerPlay: Plays
   firstPlayerVictories: number
@@ -25,7 +26,6 @@ export default class RPS {
   constructor () {
     this.id = ++RPS.id
     this.name = RPS.name
-    this.players = []
     this.firstPlayerPlay = Plays.None
     this.secondPlayerPlay = Plays.None
     this.firstPlayerVictories = 0
@@ -34,22 +34,23 @@ export default class RPS {
   }
 
   joinGame(player: User) {
-    const playersIsFull = this.players.length > 2
-    const playerAlreadyInGame = this.players.includes(player)
-    if (playersIsFull || playerAlreadyInGame) return
-    this.players.push(player)
+    if (!this.firstPlayerSeat) return this.firstPlayerSeat = player
+    if (!this.secondPlayerSeat) return this.secondPlayerSeat = player
   }
   leaveGame (player: User) {
-    if (!this.players.includes(player)) return
-    const playersSet = new Set(this.players)
-    playersSet.delete(player)
-    this.players = [...playersSet]
+    if (this.firstPlayerSeat === player) delete this.firstPlayerSeat
+    if (this.secondPlayerSeat === player) delete this.secondPlayerSeat
+  }
+  joinGameSeat (player: User, seat: 1 | 2) {
+    if (seat === 1) this.firstPlayerSeat ??= player
+    if (seat === 2) this.secondPlayerSeat ??= player
   }
   setMove (move: Plays, user: User) {
-    const playerIndex = this.players.indexOf(user)
-    if (playerIndex < 0 || playerIndex > 1) return
-    if (playerIndex === 0 && !this.firstPlayerPlay) this.firstPlayerPlay = move
-    if (playerIndex === 1 && !this.secondPlayerPlay) this.secondPlayerPlay = move
+    const userIsValid = this.firstPlayerSeat === user || this.secondPlayerSeat === user
+    if (!userIsValid) return
+    this.firstPlayerSeat === user
+      ? this.firstPlayerPlay = move
+      : this.secondPlayerPlay = move
     this.handleGameResult()
   }
   resetGame () {
@@ -59,11 +60,11 @@ export default class RPS {
     this.secondPlayerVictories = 0
   }
   firstPlayerWin () {
-    this.results.push(new RPSResult(false, this.players[0]))
+    this.results.push(new RPSResult(false, this.firstPlayerSeat))
     this.firstPlayerVictories++
   }
   secondPlayerWin () {
-    this.results.push(new RPSResult(false, this.players[1]))
+    this.results.push(new RPSResult(false, this.secondPlayerSeat))
     this.secondPlayerVictories++
   }
   isTie () {

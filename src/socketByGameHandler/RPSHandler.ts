@@ -31,20 +31,31 @@ export default function (roomNamespace: Namespace, socket: Socket, room: Room) {
     roomNamespace.to(room.id.toString()).emit('getChat', room.chat)
   })
   socket.on('joinGame', () => {
-    if (game.players.includes(user)) return
+    const userIsNotPlayer = game.firstPlayerSeat !== user && game.secondPlayerSeat !== user
+    if (userIsNotPlayer) return
     game.joinGame(user)
     roomNamespace.to(room.id.toString()).emit('getGame', game)
   })
   socket.on('leaveGame', () => {
-    if (!game.players.includes(user)) return
-    game.leaveGame(user)
+    const userIsNotPlayer = game.firstPlayerSeat !== user && game.secondPlayerSeat !== user
+    if (userIsNotPlayer) return
+    roomNamespace.to(room.id.toString()).emit('getGame', game)
+  })
+  socket.on('joinSeat', (seat: 1 | 2) => {
+    const seatAlreadyUsed = (seat === 1 && game.firstPlayerSeat) || (seat === 2 && game.secondPlayerSeat)
+    if (seatAlreadyUsed) return
+    game.joinGameSeat(user, seat)
     roomNamespace.to(room.id.toString()).emit('getGame', game)
   })
   socket.on('move', (move: Plays) => {  
+    const userIsNotPlayer = game.firstPlayerSeat !== user && game.secondPlayerSeat !== user
+    if (userIsNotPlayer) return
     game.setMove(move, user)
     roomNamespace.to(room.id.toString()).emit('getGame', game)
   })
   socket.on('resetGame', () => {
+    const userIsNotOwner = room.ownerUser !== user
+    if (!userIsNotOwner) return
     game.resetGame()
     roomNamespace.to(room.id.toString()).emit('getGame', game)
   })
