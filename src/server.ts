@@ -6,6 +6,8 @@ import { rooms } from './rooms'
 const PORT = process.env.PORT || 8080
 export const CORS_URL = process.env.CORS_URL || 'http://localhost:3000'
 
+const GAME_CLASSES = [RPS]
+
 export const httpServer = createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', CORS_URL)
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
@@ -26,6 +28,13 @@ export const httpServer = createServer((req, res) => {
       rooms.add(newRoom)
       res.end(newRoom.id.toString())
     })
+    return
+  }
+  if (req.url === '/games' && req.method === 'GET') {
+    const games = GAME_CLASSES.map(({ name, description, imgURL }) => ({ name, description, imgURL }))
+    const data = { games }
+    res.write(JSON.stringify(data))
+    res.end()
     return
   }
   res.writeHead(404, 'resource not found')

@@ -19,6 +19,8 @@ export default class RPS {
   results: Array<RPSResult>
 
   static id = 0
+  static description = 'The classic Rock, Paper & Scissor game.'
+  static imgURL = 'https://media.istockphoto.com/id/1056840214/vector/rock-paper-scissors-vector-illustration.jpg?s=612x612&w=0&k=20&c=6KEBfon5f9BXXhLiu9JfOk6EHsM193SiWMcqDjN1jqM='
 
   constructor () {
     this.id = ++RPS.id
