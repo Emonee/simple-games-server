@@ -22,7 +22,7 @@ export default class RPS {
 
   constructor () {
     this.id = ++RPS.id
-    this.name = 'RPS'
+    this.name = RPS.name
     this.players = []
     this.firstPlayerPlay = Plays.None
     this.secondPlayerPlay = Plays.None
