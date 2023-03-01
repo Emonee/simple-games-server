@@ -31,14 +31,16 @@ export default function (roomNamespace: Namespace, socket: Socket, room: Room) {
     roomNamespace.to(room.id.toString()).emit('getChat', room.chat)
   })
   socket.on('joinGame', () => {
-    const userIsNotPlayer = game.firstPlayerSeat !== user && game.secondPlayerSeat !== user
-    if (userIsNotPlayer) return
+    const noFreeSeats = game.firstPlayerSeat && game.secondPlayerSeat
+    if (noFreeSeats) return
     game.joinGame(user)
     roomNamespace.to(room.id.toString()).emit('getGame', game)
   })
   socket.on('leaveGame', () => {
     const userIsNotPlayer = game.firstPlayerSeat !== user && game.secondPlayerSeat !== user
     if (userIsNotPlayer) return
+    const userIsFirstPlayer = game.firstPlayerSeat === user
+    userIsFirstPlayer ? delete game.firstPlayerSeat : delete game.secondPlayerSeat
     roomNamespace.to(room.id.toString()).emit('getGame', game)
   })
   socket.on('joinSeat', (seat: 1 | 2) => {
