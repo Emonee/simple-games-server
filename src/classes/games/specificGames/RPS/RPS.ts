@@ -1,6 +1,5 @@
 import User from "../../../User";
-import Game from "../../Game";
-import Result from "./Result";
+import RPSResult from "./RPSResult";
 
 export enum Plays {
   None,
@@ -9,36 +8,49 @@ export enum Plays {
   Sissors
 }
 
-enum GameState {
-  WaintingPlays,
-  ShowingResults
-}
-
-export default class RPS extends Game {
+export default class RPS {
+  readonly id: number
   readonly name: string
+  firstPlayerSeat?: User
+  secondPlayerSeat?: User
   firstPlayerPlay: Plays
   secondPlayerPlay: Plays
   firstPlayerVictories: number
   secondPlayerVictories: number
-  state: GameState
-  results: Array<Result>
+  results: Array<RPSResult>
+
+  static id = 0
+  static description = 'The classic Rock, Paper & Scissor game.'
+  static imgURL = 'https://media.istockphoto.com/id/1056840214/vector/rock-paper-scissors-vector-illustration.jpg?s=612x612&w=0&k=20&c=6KEBfon5f9BXXhLiu9JfOk6EHsM193SiWMcqDjN1jqM='
 
   constructor () {
-    super()
-    this.name = 'RPS'
+    this.id = ++RPS.id
+    this.name = RPS.name
     this.firstPlayerPlay = Plays.None
     this.secondPlayerPlay = Plays.None
     this.firstPlayerVictories = 0
     this.secondPlayerVictories = 0
-    this.state = GameState.WaintingPlays
     this.results = []
   }
 
+  joinGame(player: User) {
+    if (!this.firstPlayerSeat) return this.firstPlayerSeat = player
+    if (!this.secondPlayerSeat) return this.secondPlayerSeat = player
+  }
+  leaveGame (player: User) {
+    if (this.firstPlayerSeat === player) delete this.firstPlayerSeat
+    if (this.secondPlayerSeat === player) delete this.secondPlayerSeat
+  }
+  joinGameSeat (player: User, seat: 1 | 2) {
+    if (seat === 1) this.firstPlayerSeat ??= player
+    if (seat === 2) this.secondPlayerSeat ??= player
+  }
   setMove (move: Plays, user: User) {
-    const playerIndex = this.players.indexOf(user)
-    if (playerIndex < 0 || playerIndex > 1) return
-    if (playerIndex === 0 && !this.firstPlayerPlay) this.firstPlayerPlay = move
-    if (playerIndex === 1 && !this.secondPlayerPlay) this.secondPlayerPlay = move
+    const userIsValid = this.firstPlayerSeat === user || this.secondPlayerSeat === user
+    if (!userIsValid) return
+    this.firstPlayerSeat === user
+      ? this.firstPlayerPlay = move
+      : this.secondPlayerPlay = move
     this.handleGameResult()
   }
   resetGame () {
@@ -48,15 +60,15 @@ export default class RPS extends Game {
     this.secondPlayerVictories = 0
   }
   firstPlayerWin () {
-    this.results.push(new Result(false, this.players[0]))
+    this.results.push(new RPSResult(false, this.firstPlayerSeat))
     this.firstPlayerVictories++
   }
   secondPlayerWin () {
-    this.results.push(new Result(false, this.players[1]))
+    this.results.push(new RPSResult(false, this.secondPlayerSeat))
     this.secondPlayerVictories++
   }
   isTie () {
-    this.results.push(new Result(true))
+    this.results.push(new RPSResult(true))
     this.firstPlayerPlay = Plays.None
     this.secondPlayerPlay = Plays.None
   }
