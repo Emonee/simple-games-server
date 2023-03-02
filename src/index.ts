@@ -15,6 +15,10 @@ const roomNamespace = io.of(/^\/rooms\/\d/)
 roomNamespace.on('connection', function (socket) {
   const roomId = socket.nsp.name.slice(7)
   const room: Room = rooms.find((room: Room) => room.id === +roomId)
-  if (!room) return socket.disconnect()
+  if (!room) {
+    socket.emit('error', { message: `Room ${roomId} not found` })
+    socket.disconnect()
+    return
+  }
   socketByGameHandler(roomNamespace, socket, room)
 })
